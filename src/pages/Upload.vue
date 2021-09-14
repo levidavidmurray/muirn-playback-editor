@@ -1,31 +1,47 @@
 <template>
   <base-template title="Upload">
     <div class="max-w-screen-lg mx-auto">
-      <div class="aspect-w-16 aspect-h-9 bg-black">
+      <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg">
         <video
           ref="video"
           src="/home_video.mov"
           @loadedmetadata="onLoadedMetadata"
+          @durationchange="onDurationChange"
           @timeupdate="onTimeUpdate"
         ></video>
       </div>
-      <div
-        ref="timeline"
-        class="flex relative bg-gray-300 w-100 max-w-screen-lg mx-auto mt-2"
-        @mousemove="onMouseMove"
-        @mouseleave="onMouseLeave"
-        @mousedown="onMouseDown"
-        @mouseup="onMouseUp"
-      >
-        <div ref="scrubber" class="scrubber z-20 bg-yellow-400"></div>
-        <div ref="highlight" class="scrubber z-10" :class="scrubberHighlightClasses"></div>
+      <!-- Timeline Background -->
+      <div class="bg-secondary-100 rounded-lg overflow-hidden py-4 px-4 mt-6">
+        <!-- Timeline -->
         <div
-          v-for="(segment, index) in segments"
-          segment
-          class="segment bg-accent-400"
-          :key="`segment-${index}`"
-          :style="getSegmentStyles(segment, index)"
-        ></div>
+          ref="timeline"
+          class="relative bg-secondary-100 w-100 max-w-screen-lg mx-auto"
+          @mousemove="onMouseMove"
+          @mouseleave="onMouseLeave"
+          @mousedown="onMouseDown"
+          @mouseup="onMouseUp"
+        >
+          <!-- Time Indicator -->
+          <div class="flex justify-between w-100 mb-4 text-sm font-semibold">
+            <span>{{ startTimeDisplay }}</span>
+            <span class="text-gray-700">{{ currentTimeDisplay }} / {{ endTimeDisplay }}</span>
+            <span>{{ endTimeDisplay }}</span>
+          </div>
+          <!-- Timeline Segments -->
+          <div class="relative flex w-100">
+            <div
+              v-for="(segment, index) in segments"
+              class="segment"
+              @click="(event) => onSegmentClick(event, segment, index)"
+              :key="segment.id"
+              :style="getSegmentStyles(segment, index)"
+              :class="getSegmentClasses(index)"
+            ></div>
+            <!-- Timeline Scrubber -->
+            <div ref="scrubber" class="scrubber z-20 bg-yellow-400"></div>
+          </div>
+          <!-- <div ref="highlight" class="scrubber z-10" :class="scrubberHighlightClasses"></div> -->
+        </div>
       </div>
     </div>
   </base-template>
@@ -36,23 +52,32 @@ import BaseTemplate from './BaseTemplate.vue'
 
 import { clamp, isBetween } from '@/util/math';
 import { computed, reactive, Ref, ref, StyleValue } from 'vue'
+import { v4 as uuid } from 'uuid';
+import { secondsToSmartFormat } from '@/util/date';
 
 interface VideoSegment {
+  id: string;
   startTime: number;
   endTime: number;
 }
 
 enum EDIT_MODE {
   SELECT,
-  CUT,
+  SLICE,
 }
 
 const segments: VideoSegment[] = reactive([]);
+let selectedSegmentMap: Map<string, boolean> = reactive(new Map());
+let selectedSegments: VideoSegment[] = reactive([]);
 
 const video: Ref<HTMLVideoElement | null> = ref(null);
 const highlight: Ref<HTMLElement | null> = ref(null);
 const scrubber: Ref<HTMLElement | null> = ref(null);
 const timeline: Ref<HTMLElement | null> = ref(null);
+
+const startTimeDisplay = ref("00:00");
+const currentTimeDisplay = ref("00:00");
+const endTimeDisplay = ref("00:00");
 
 const isHighlightVisible = ref(false);
 const isMouseDown = ref(false);
@@ -65,15 +90,30 @@ function isMode(mode: EDIT_MODE) {
   return editMode.value === mode;
 }
 
+function createSegment(startTime: number, endTime: number): VideoSegment {
+  const id = `segment-${uuid()}`;
+  selectedSegmentMap.set(id, false);
+  return {
+    id,
+    startTime,
+    endTime,
+  };
+}
+
 function onLoadedMetadata(event: any) {
-  segments.push({
-    startTime: 0,
-    endTime: video.value!.duration,
-  });
+  segments.push(createSegment(0, video.value!.duration));
+}
+
+function onDurationChange(event: any) {
+  const lessThanHour = video.value!.duration < 3600;
+  startTimeDisplay.value = lessThanHour ? startTimeDisplay.value : "00:00:00";
+  currentTimeDisplay.value = secondsToSmartFormat(video.value!.currentTime);
+  endTimeDisplay.value = secondsToSmartFormat(video.value!.duration);
 }
 
 function onTimeUpdate(event: any) {
   setScrubberPosition(getTimelinePositionForTime(video.value!.currentTime));
+  currentTimeDisplay.value = secondsToSmartFormat(video.value!.currentTime);
   // No segments in timeline
   if (segments.length === 0) return;
 
@@ -118,10 +158,7 @@ function splitAtTime(time: number) {
   if (segmentIndex < 0) return;
 
   const segmentToSplit = segments[segmentIndex];
-  const newSegment: VideoSegment = {
-    startTime: time,
-    endTime: segmentToSplit.endTime,
-  };
+  const newSegment = createSegment(time, segmentToSplit.endTime);
   segmentToSplit.endTime = time - 0.01;
   segments.splice(segmentIndex + 1, 0, newSegment);
 }
@@ -143,22 +180,27 @@ function handleMouseMove({ offsetX }: { offsetX: number }) {
   if (!timeline.value || !video.value) return;
 
   const timelineValue = getTimelineInterpolation(offsetX);
-  highlight.value?.style.setProperty('--x', `${offsetX}px`);
-  isHighlightVisible.value = !isMouseDown.value;
+}
 
-  if (isMouseDown.value) {
-    setScrubberPosition(offsetX);
-    video.value.currentTime = video.value.duration * timelineValue;
+function onSegmentClick(event: MouseEvent, segment: VideoSegment, index: number) {
+  if (isMode(EDIT_MODE.SLICE)) {
+    return;
   }
+
+  // Clear all existing selected segments if shift key isn't held
+  if (!event.shiftKey) {
+    selectedSegmentMap.forEach((isSelected, id) => {
+      selectedSegmentMap.set(id, false);
+    });
+  }
+
+  selectedSegmentMap.set(segment.id, true);
 }
 
 function onMouseMove(event: MouseEvent) {
   // stop document listener from executing handleMouseMove
   event.stopImmediatePropagation();
   const { offsetX } = event;
-  if (mouseMoveDebug.value) {
-    console.log("[timeline] onMouseMove", event)
-  }
   handleMouseMove({ offsetX })
 }
 
@@ -167,16 +209,17 @@ function onMouseLeave() {
 }
 
 function onMouseDown({ offsetX }: MouseEvent) {
+  if (isMode(EDIT_MODE.SELECT)) {
+    return;
+  }
   isMouseDown.value = true;
-  scrubber.value?.style.setProperty('--x', `${offsetX}px`);
   handleMouseMove({ offsetX });
 
-  if (isMode(EDIT_MODE.CUT)) {
+  if (isMode(EDIT_MODE.SLICE)) {
     const timelineValue = getTimelineInterpolation(offsetX);
     const splitTime = video.value!.duration * timelineValue;
 
     splitAtTime(splitTime);
-
   }
 }
 
@@ -209,12 +252,17 @@ function documentMouseMoveListener(event: MouseEvent) {
   handleMouseMove({ offsetX: calculatedOffsetX });
 }
 
-// function getSegmentClasses(index: number) {
-//   return segmentColors[index];
-// }
+function getSegmentClasses(index: number) {
+  const isSelected = selectedSegmentMap.get(segments[index].id);
+  return {
+    'pointer-events-none': isMode(EDIT_MODE.SLICE),
+    'bg-primary-500': isSelected,
+    'bg-primary-400': !isSelected,
+  };
+}
 
 function getSegmentStyles(segment: VideoSegment, index: number) {
-  const SEGMENT_GUTTER = 3;
+  const SEGMENT_GUTTER = 2;
   let segmentStartPos = getTimelinePositionForTime(segment.startTime);
   let segmentEndPos = getTimelinePositionForTime(segment.endTime);
 
@@ -227,10 +275,29 @@ function getSegmentStyles(segment: VideoSegment, index: number) {
   } as StyleValue;
 }
 
+/** Computed */
+
+// const startTimeDisplay = computed(() => {
+//   if (!video.value || video.value.currentTime < 3600) return "00:00";
+//   return "00:00:00";
+// });
+
+// const endTimeDisplay = computed(() => {
+//   if (!video.value || video.value.duration === undefined) return "00:00";
+//   console.log(video.value.duration);
+//   return secondsToSmartFormat(video.value.duration);
+// });
+
+// const currentTimeDisplay = computed(() => {
+//   if (!video.value || video.value.currentTime === undefined) return "00:00";
+//   console.log(video.value.currentTime);
+//   return secondsToSmartFormat(video.value.currentTime);
+// })
+
 const scrubberHighlightClasses = computed(() => {
   return {
     'bg-gray-50': isMode(EDIT_MODE.SELECT),
-    'bg-red-500': isMode(EDIT_MODE.CUT),
+    'bg-red-500': isMode(EDIT_MODE.SLICE),
     'opacity-0': !isHighlightVisible.value,
   };
 });
@@ -246,7 +313,7 @@ const keyHandlers: { [key: string]: () => void } = {
     video.value?.paused ? video.value?.play() : video.value?.pause();
   },
   "KeyC": () => {
-    editMode.value = EDIT_MODE.CUT;
+    editMode.value = EDIT_MODE.SLICE;
   },
   "KeyV": () => {
     editMode.value = EDIT_MODE.SELECT;
@@ -262,7 +329,7 @@ document.addEventListener('keydown', (event) => {
 .scrubber {
   --x: 0;
   position: absolute;
-  height: 100%;
+  height: 200%;
   width: 2px;
   left: var(--x);
   pointer-events: none;
@@ -272,10 +339,9 @@ document.addEventListener('keydown', (event) => {
 .segment {
   --width: 0;
   height: 64px;
-  margin-left: 3px;
+  margin-left: 2px;
   width: var(--width);
   top: 0;
-  pointer-events: none;
   z-index: 1;
   border-radius: 8px;
 }
