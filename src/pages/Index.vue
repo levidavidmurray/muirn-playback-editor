@@ -29,4 +29,5 @@
 </template>
 <script setup lang="ts">
 import HelloWorld from '@/components/HelloWorld.vue'
+import BaseTemplate from './BaseTemplate.vue'
 </script>

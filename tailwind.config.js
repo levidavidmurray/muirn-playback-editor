@@ -1,5 +1,6 @@
 const plugin = require('tailwindcss/plugin')
-// const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors')
 
 module.exports = {
   mode: 'jit',
@@ -7,14 +8,18 @@ module.exports = {
     enabled: process.env.NODE_ENV === 'production',
     content: ['./index.html', './src/**/*.{vue,ts}'],
   },
-  // theme: {
-  //   extend: {
-  //     // here's how to extend fonts if needed
-  //     fontFamily: {
-  //       sans: [...defaultTheme.fontFamily.sans],
-  //     },
-  //   },
-  // },
+  theme: {
+    extend: {
+      colors: {
+        primary: colors.teal,
+        secondary: colors.sky,
+        accent: colors.pink,
+      },
+      fontFamily: {
+        sans: ['"Inter var"', ...defaultTheme.fontFamily.sans],
+      }
+    },
+  },
   plugins: [
     require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/line-clamp'),
