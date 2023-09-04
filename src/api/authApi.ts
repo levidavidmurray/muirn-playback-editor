@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { GenericResponse, ILoginInput, ILoginResponse, ISignUpInput } from './types'
+import { IMessageResponse, ILoginInput, ILoginResponse, ISignUpInput, IUserResponse, IFamilyResponse, IFamilyMemberResponse } from './types'
 const BASE_URL = 'http://localhost:3000'
 
 const authApi = axios.create({
@@ -14,13 +14,18 @@ export const refreshAccessTokenFn = async () => {
   return response.data
 }
 
+authApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken')
+  if (token) {
+    config.headers['Authorization'] = `${token}`
+  }
+  return config
+})
+
 authApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
-    // if (error.message == 'Network Error') {
-
-    // }
     const errMessage = error.response?.data?.message as string
     if (errMessage?.includes('not logged in') && !originalRequest._retry) {
       originalRequest._retry = true
@@ -32,21 +37,40 @@ authApi.interceptors.response.use(
 )
 
 export const signUpUserFn = async (user: ISignUpInput) => {
-  const response = await authApi.post<GenericResponse>('/signup', { user })
+  const response = await authApi.post<IMessageResponse>('/signup', { user })
   return response.data
 }
 
 export const loginUserFn = async (user: ILoginInput) => {
-  const response = await authApi.post<ILoginResponse>('/login', { user })
+  const response = await authApi.post<IMessageResponse>('/login', { user })
+
+  const token = response.headers['authorization']
+  if (token) {
+    localStorage.setItem('accessToken', token)
+  }
+
   return response.data
 }
 
 export const logoutUserFn = async () => {
-  const response = await authApi.get<GenericResponse>('/logout')
-  return response.data
+  localStorage.removeItem('accessToken')
+  // const response = await authApi.get<GenericResponse>('/logout')
+  // return response.data
 }
 
 export const getMeFn = async () => {
-  const response = await authApi.get('/me')
+  const response = await authApi.get<IUserResponse>('/me', {
+    headers: { 'Cache-Control': 'no-cache' },
+  })
+  return response.data
+}
+
+export const getFamilyFn = async (familyId: string) => {
+  const response = await authApi.get<IFamilyResponse>(`/families/${familyId}`)
+  return response.data
+}
+
+export const getFamilyMemberFn = async (familyMemberId: string) => {
+  const response = await authApi.get<IFamilyMemberResponse>(`/family_members/${familyMemberId}`)
   return response.data
 }

@@ -1,37 +1,43 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
-import Upload from '@/pages/Upload.vue'
-import About from '@/pages/About.vue'
-import FamilyHome from './pages/FamilyHome.vue'
+import { useAuthStore } from './stores/authStore'
+import middlewarePipeline from './router/middlewarePipeline'
+import requireAuth from './router/middleware/requireAuth'
+import requireUnauth from './router/middleware/requireUnauth'
 
 const routes = [
   {
-    path: '/',
-    component: FamilyHome,
+    name: 'login',
+    path: '/login',
+    component: () => import('@/pages/Login.vue'),
     meta: {
-      title: 'Muirn | Family Memories',
+      middleware: [requireUnauth]
+    }
+  },
+  {
+    name: 'signup',
+    path: '/signup',
+    component: () => import('@/pages/SignUp.vue'),
+    meta: {
+      middleware: [requireUnauth]
+    }
+  },
+  {
+    name: 'home',
+    path: '/',
+    component: () => import('@/pages/FamilyHome.vue'),
+    meta: {
+      title: 'My Family',
+      middleware: [requireAuth],
     },
   },
   {
-    path: '/login/',
-    component: () => import('@/pages/Login.vue'),
-  },
-  {
-    path: '/signup/',
-    component: () => import('@/pages/SignUp.vue'),
-  },
-  {
-    path: '/upload/',
-    component: Upload,
+    name: 'upload',
+    path: '/upload',
+    component: () => import('@/pages/Upload.vue'),
     meta: {
       title: 'Upload',
-    },
-  },
-  {
-    path: '/about/',
-    component: About,
-    meta: {
-      title: 'About',
+      middleware: [requireAuth],
     },
   },
 ]
@@ -39,6 +45,23 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  const authStore = useAuthStore()
+
+  if (!to.meta.middleware) {
+    return next()
+  }
+
+  const middleware = to.meta.middleware as any
+
+  const context = { to, from, next, authStore }
+
+  return middleware[0]({
+    ...context,
+    next: middlewarePipeline(context, middleware, 1),
+  })
 })
 
 export default router

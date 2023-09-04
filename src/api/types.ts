@@ -1,10 +1,45 @@
-export interface IUser {
-  email: string
-  id: string
+/* Generics */
+export interface IData<T> {
+  data: T
 }
 
-export interface GenericResponse {
-  status: string
+export interface IRecord<T = {}> {
+  id: string
+  type: string
+  attributes?: T
+}
+
+export interface IRootRecord<T, K> extends IRecord<T> {
+  relationships?: K
+}
+
+/* API Responses */
+
+export type IUserRecord = IRootRecord<{ email: string }, {
+  family: IData<IRecord>
+  familyMember: IData<IRecord>
+  familyUser: IData<IRecord>
+}>
+
+export type IUserResponse = IData<IUserRecord>
+
+export type IFamilyRecord = IRootRecord<{ name: string }, {
+  familyMembers: IData<IRecord[]>
+}>
+
+export type IFamilyResponse = IData<IFamilyRecord>
+
+export type IFamilyMemberRecord = IRootRecord<{
+  firstName: string
+  lastName: string
+  dateOfBirth: string
+}, {
+  family: IData<IRecord>
+}>
+
+export type IFamilyMemberResponse = IData<IFamilyMemberRecord>
+
+export interface IMessageResponse {
   message: string
 }
 
@@ -20,12 +55,7 @@ export interface ISignUpInput {
 }
 
 export interface ILoginResponse {
-  status: string
-  access_token: string
-}
-
-export interface IUserResponse {
-  status: string
+  message: string
   data: {
     user: IUser
   }

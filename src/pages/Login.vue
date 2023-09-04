@@ -37,6 +37,7 @@ import { loginUserFn } from '@/api/authApi'
 import type { ILoginInput } from '@/api/types'
 import { FormInst, useMessage, NForm, NFormItem, NInput, NButton, NAlert } from 'naive-ui'
 import { ref } from 'vue'
+import router from '@/router'
 
 const formRef = ref<FormInst | null>(null)
 const message = useMessage()
@@ -79,7 +80,8 @@ const { isLoading, mutate } = useMutation((credentials: ILoginInput) => loginUse
     }
   },
   onSuccess: (data) => {
-    message.success(data.status)
+    message.success(data.message)
+    router.push({ name: 'home'})
   },
 })
 

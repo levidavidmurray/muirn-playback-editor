@@ -1,8 +1,8 @@
+import { IUserRecord } from '@/api/types'
 import { defineStore } from 'pinia'
-import { IUser } from '../api/types'
 
 export type AuthStoreState = {
-  authUser: IUser | null
+  authUser: IUserRecord | null
 }
 
 export const useAuthStore = defineStore({
@@ -12,7 +12,7 @@ export const useAuthStore = defineStore({
   }),
   getters: {},
   actions: {
-    setAuthUser(user: IUser | null) {
+    setAuthUser(user: IUserRecord | null) {
       this.authUser = user
     },
   },
