@@ -2,19 +2,26 @@
   "name": "vite-ts-tailwind-starter",
   "version": "1.5.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 8080",
     "build": "vite build",
     "preview": "vite build && vite preview",
     "start": "yarn dev & wait-on tcp:3000 -v",
     "test": "cypress open",
-    "test:ci": "cypress run --headless"
+    "test:ci": "cypress run --headless",
+    "lint:js": "eslint src --ext .ts,.vue"
   },
   "dependencies": {
+    "@vee-validate/zod": "^4.11.3",
     "@vueuse/head": "~0.6",
+    "axios": "^1.5.0",
+    "pinia": "^2.1.6",
     "uuid": "^8.3.2",
-    "vue": "~3.2",
+    "vee-validate": "^4.11.3",
+    "vue": "~3.3",
+    "vue-query": "^1.26.0",
     "vue-router": "~4.0",
-    "vuex": "~4.0"
+    "vuex": "~4.0",
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "~0.2",
@@ -25,7 +32,7 @@
     "@typescript-eslint/eslint-plugin": "~4",
     "@typescript-eslint/parser": "~4",
     "@vitejs/plugin-vue": "~1.4",
-    "@vue/compiler-sfc": "~3.2",
+    "@vue/compiler-sfc": "~3.3",
     "@vue/eslint-config-standard": "~6.1",
     "@vue/eslint-config-typescript": "~7.0",
     "@vuedx/typecheck": "~0.7",
@@ -33,12 +40,17 @@
     "autoprefixer": "~10.3",
     "cypress": "~8.3",
     "eslint": "~7",
-    "eslint-plugin-vue": "~7",
-    "postcss": "~8.3",
-    "postcss-nesting": "~8.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "naive-ui": "^2.34.4",
+    "postcss": "^8.4.29",
+    "postcss-nesting": "^12.0.1",
+    "prettier": "^3.0.3",
     "tailwindcss": "~2.2",
     "typescript": "~4.3",
     "vite": "~2.5",
+    "vue-eslint-parser": "^9.3.1",
     "wait-on": "~6.0"
   }
 }

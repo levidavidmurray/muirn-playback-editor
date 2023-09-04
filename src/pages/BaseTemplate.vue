@@ -1,6 +1,6 @@
 <template>
   <header class="container py-8 mx-auto">
-    <h1 class="text-primary-500 font-semibold">{{ title }}</h1>
+    <h1 class="text-primary-500 text-5xl font-black">{{ title }}</h1>
   </header>
   <div class="container mx-auto">
     <slot></slot>
@@ -16,10 +16,6 @@ const props = defineProps<{
 
 // Note: these are static. If you need these to be reactive, use ref() or reactive()
 useHead({
-  bodyAttrs: {
-    title: props.title,
-    class: 'home summer',
-  },
   meta: [
     {
       property: 'og:title',

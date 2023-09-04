@@ -1,6 +1,5 @@
 <template>
   <BaseTemplate title="Vite-TS-Tailwind Starter">
-    <HelloWorld opt msg="Hello Vue 3 + Vite + Tailwind CSS" />
 
     <hr />
 
@@ -28,6 +27,5 @@
   </BaseTemplate>
 </template>
 <script setup lang="ts">
-import HelloWorld from '@/components/HelloWorld.vue'
 import BaseTemplate from './BaseTemplate.vue'
 </script>

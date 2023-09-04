@@ -1,15 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Index from '@/pages/Index.vue'
 import Upload from '@/pages/Upload.vue'
 import About from '@/pages/About.vue'
+import FamilyHome from './pages/FamilyHome.vue'
 
 const routes = [
   {
     path: '/',
+    component: FamilyHome,
+    meta: {
+      title: 'Muirn | Family Memories',
+    },
+  },
+  {
+    path: '/login/',
+    component: () => import('@/pages/Login.vue'),
+  },
+  {
+    path: '/signup/',
+    component: () => import('@/pages/SignUp.vue'),
+  },
+  {
+    path: '/upload/',
     component: Upload,
     meta: {
-      title: 'Vite + Vue + TypeScript + Tailwind Starter Template',
+      title: 'Upload',
     },
   },
   {
