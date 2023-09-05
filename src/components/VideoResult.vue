@@ -1,11 +1,20 @@
 <template>
   <div class="video-result">
-    <div class="video-thumbnail flex justify-center items-center shadow-lg">
-      <i class="fa-regular fa-circle-play text-6xl text-white"></i>
+    <div
+      @click="handleClick"
+      class="video-thumbnail flex justify-center items-center shadow-lg cursor-pointer relative rounded-lg overflow-hidden">
+      <!-- <i class="fa-regular fa-circle-play text-6xl text-white relative z-10"></i> -->
+      <img v-if="result.thumbnail_url" :src="result.thumbnail_url" class="w-full h-full absolute object-cover">
     </div>
     <div class="flex mt-4">
       <avatar :src="result.uploader?.avatar_url" size="32px" />
-      <span class="font-semibold ml-2 leading-5">{{ result.title }}</span>
+      <div class="ml-2">
+        <span class="font-semibold block leading-5 cursor-pointer" @click="handleClick">{{ result.title }}</span>
+        <div class="text-sm text-gray-600 flex items-center justify-between">
+          <span>Levi Murray</span>
+          <span>Apr 2001</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -14,9 +23,17 @@
 import { VideoResultDto } from '@/api/types';
 import Avatar from './Avatar.vue'
 
-defineProps<{
+const { result } = defineProps<{
   result: VideoResultDto
 }>()
+
+const emit = defineEmits<{
+  select: [VideoResultDto]
+}>()
+
+function handleClick() {
+  emit('select', result)
+}
 </script>
 
 <style scoped>
@@ -25,7 +42,6 @@ defineProps<{
 }
 
 .video-thumbnail {
-  background-color: #0b2837;
   width: 256px;
   height: 144px;
   border-radius: 8px;

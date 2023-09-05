@@ -40,6 +40,23 @@ const routes = [
       middleware: [requireAuth],
     },
   },
+  {
+    name: 'processing',
+    path: '/processing/:videoId',
+    component: () => import('@/pages/Upload.vue'),
+    meta: {
+      title: 'Upload',
+      middleware: [requireAuth],
+    },
+  },
+  {
+    name: 'video',
+    path: '/video/:videoId',
+    component: () => import('@/pages/VideoView.vue'),
+    meta: {
+      title: 'Video Player',
+    },
+  },
 ]
 
 const router = createRouter({

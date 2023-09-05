@@ -1,5 +1,14 @@
 import axios from 'axios'
-import { IMessageResponse, ILoginInput, ILoginResponse, ISignUpInput, IUserResponse, IFamilyResponse, IFamilyMemberResponse } from './types'
+import {
+  IMessageResponse,
+  ILoginInput,
+  ILoginResponse,
+  ISignUpInput,
+  IUserResponse,
+  IFamilyResponse,
+  IFamilyMemberResponse,
+  IVideoResponse,
+} from './types'
 const BASE_URL = 'http://localhost:3000'
 
 const authApi = axios.create({
@@ -72,5 +81,21 @@ export const getFamilyFn = async (familyId: string) => {
 
 export const getFamilyMemberFn = async (familyMemberId: string) => {
   const response = await authApi.get<IFamilyMemberResponse>(`/family_members/${familyMemberId}`)
+  return response.data
+}
+
+export const uploadVideoFn = async (video: File) => {
+  const formData = new FormData()
+  formData.append('video', video)
+  const response = await authApi.post<IVideoResponse>('/videos', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  return response.data
+}
+
+export const getVideoFn = async (videoId: string) => {
+  const response = await authApi.get<IVideoResponse>(`/videos/${videoId}`)
   return response.data
 }

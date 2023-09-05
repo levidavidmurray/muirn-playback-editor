@@ -39,6 +39,18 @@ export type IFamilyMemberRecord = IRootRecord<{
 
 export type IFamilyMemberResponse = IData<IFamilyMemberRecord>
 
+export type IVideoRecord = IRootRecord<{
+  title: string
+  thumbnailUrl: string
+  videoUrl: string
+  date: string
+}, {
+  user: IData<IRecord>
+  family: IData<IRecord>
+}>
+
+export type IVideoResponse = IData<IVideoRecord>
+
 export interface IMessageResponse {
   message: string
 }

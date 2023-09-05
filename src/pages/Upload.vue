@@ -3,7 +3,15 @@
     <div class="max-w-screen-lg mx-auto">
       <uploader-file-drop-zone @files-dropped="addFiles" />
       <div style="max-width: 858px" class="mx-auto">
-        <input type="file" accept="video/*" class="mb-4" @change="onVideoChange" />
+        <div v-if="!videoData" class="flex items-center justify-between mb-4">
+          <input type="file" accept="video/*" @change="onVideoChange" />
+          <n-button type="primary" @click="handleUpload">Upload</n-button>
+        </div>
+        <div v-else class="flex items-center justify-between mb-4">
+          <n-input placeholder="Enter Video Title" v-model:value="newVideoData.title" />
+          <n-date-picker v-model:value="newVideoData.date" type="date" class="mx-4" />
+          <n-button type="primary" @click="handleUpload">Upload</n-button>
+        </div>
         <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg">
           <video
             ref="video"
@@ -74,10 +82,36 @@
 import BaseTemplate from './BaseTemplate.vue'
 import UploaderFileDropZone from '@/components/UploaderFileDropZone.vue'
 
+import { NButton, NInput, NDatePicker } from 'naive-ui'
 import { clamp, isBetween } from '@/util/math'
-import { computed, onBeforeUpdate, reactive, Ref, ref, StyleValue } from 'vue'
+import { computed, onBeforeUpdate, reactive, Ref, ref, StyleValue, watch } from 'vue'
 import { v4 as uuid } from 'uuid'
 import { secondsToSmartFormat } from '@/util/date'
+import { uploadVideoFn } from '@/api/authApi'
+import { useRoute } from 'vue-router'
+import { useVideoQuery } from '@/stores/query'
+
+const route = useRoute()
+
+const { isLoading, data: videoData } = useVideoQuery(route.params.videoId as string)
+
+const newVideoData = ref({
+  title: '',
+  date: 0,
+})
+
+watch(videoData, (newVal) => {
+  console.log('videoData', newVal)
+  if (!newVal) return
+  newVideoData.value = {
+    title: newVal.data.attributes!.title,
+    date: 0,
+  }
+})
+
+if (route.params.videoId) {
+  console.log('route.params.videoId', route.params.videoId)
+}
 
 interface VideoSegment {
   id: string
@@ -106,6 +140,7 @@ const currentTimeDisplay = ref('00:00')
 const endTimeDisplay = ref('00:00')
 
 const videoSrc = ref('/levi-drew-wedding-2001.mp4')
+const videoFile = ref(null)
 
 const isHighlightVisible = ref(false)
 const isMovingScrubber = ref(false)
@@ -118,6 +153,12 @@ onBeforeUpdate(() => {
   segmentElRefs.value = []
 })
 
+function handleUpload() {
+  if (!videoFile.value) return
+  console.log('handleUpload', videoFile.value)
+  uploadVideoFn(videoFile.value)
+}
+
 function isMode(mode: EDIT_MODE) {
   return editMode.value === mode
 }
@@ -127,12 +168,12 @@ function addFiles(event: any) {
 }
 
 function onVideoChange(event: any) {
-  const selectedFile = event.target.files[0]
-  if (selectedFile) {
+  videoFile.value = event.target.files[0]
+  if (videoFile.value) {
     // selectedSegmentMap = reactive(new Map())
     // segmentElRefs.value = []
     segments.length = 0
-    videoSrc.value = URL.createObjectURL(selectedFile)
+    videoSrc.value = URL.createObjectURL(videoFile.value)
   }
 }
 
