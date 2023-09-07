@@ -1,6 +1,6 @@
 <template>
   <n-dropdown trigger="click" :options="options" @select="handleSelect">
-    <n-button quaternary class="py-2 box-content">
+    <n-button quaternary class="py-2 box-content absolute right-0 top-4">
       <avatar size="32px" src="/levi-avatar.jpg" />
       <span class="ml-2 font-medium">{{ fullName }}</span>
     </n-button>
@@ -9,6 +9,7 @@
 
 <script setup lang="ts">
 import { logoutUserFn } from '@/api/authApi';
+import router from '@/router';
 import { useFamilyMemberQuery, useMeQuery } from '@/stores/query';
 import { NDropdown, NButton } from 'naive-ui'
 import { computed } from 'vue';
@@ -32,15 +33,22 @@ const fullName = computed(() => {
 
 const options = [
   {
+    label: 'Upload',
+    key: 'upload'
+  },
+  {
     label: 'Logout',
     key: 'logout'
-  }
+  },
 ]
 
 const optionFns = {
   logout: async () => {
     await logoutUserFn()
     document.location.href = '/login'
+  },
+  upload: () => {
+    router.push({ name: 'newUpload' })
   }
 }
 

@@ -32,18 +32,18 @@ const routes = [
     },
   },
   {
-    name: 'upload',
-    path: '/upload',
-    component: () => import('@/pages/Upload.vue'),
+    name: 'newUpload',
+    path: '/uploads/new',
+    component: () => import('@/pages/UploadNew.vue'),
     meta: {
       title: 'Upload',
       middleware: [requireAuth],
     },
   },
   {
-    name: 'processing',
-    path: '/processing/:videoId',
-    component: () => import('@/pages/Upload.vue'),
+    name: 'upload',
+    path: '/uploads/:uploadId',
+    component: () => import('@/pages/UploadStatus.vue'),
     meta: {
       title: 'Upload',
       middleware: [requireAuth],

@@ -3,12 +3,12 @@
 </template>
 
 <script setup lang="ts">
-import { VideoResultDto } from '@/api/types';
 import videojs from 'video.js'
 import { onMounted, ref } from 'vue'
 
-const { video } = defineProps<{
-  video: VideoResultDto
+const { videoSrc, type = 'application/x-mpegURL' } = defineProps<{
+  videoSrc: string,
+  type?: 'application/x-mpegURL' | 'video/mp4'
 }>()
 
 const options: videojs.PlayerOptions = {
@@ -18,8 +18,8 @@ const options: videojs.PlayerOptions = {
   responsive: true,
   sources: [
     {
-      src: video.video_url!,
-      type: 'application/x-mpegURL'
+      src: videoSrc,
+      type: type,
     }
   ]
 }

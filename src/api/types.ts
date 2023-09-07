@@ -43,13 +43,28 @@ export type IVideoRecord = IRootRecord<{
   title: string
   thumbnailUrl: string
   videoUrl: string
-  date: string
+  date: number
 }, {
   user: IData<IRecord>
   family: IData<IRecord>
 }>
 
 export type IVideoResponse = IData<IVideoRecord>
+
+export type IUploadRecord = IRootRecord<{
+  date: string
+  status: string
+  title: string
+}, {
+  user: IData<IRecord>
+}>
+
+export type IUploadResponse = IData<IVideoRecord>
+
+export interface IUploadInput {
+  title: string
+  date: number
+}
 
 export interface IMessageResponse {
   message: string

@@ -3,8 +3,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  mode: 'jit',
-  purge: {
+  content: {
     enabled: process.env.NODE_ENV === 'production',
     content: ['./index.html', './src/**/*.{vue,ts}'],
   },
@@ -20,9 +19,10 @@ module.exports = {
       }
     },
   },
+  corePlugins: {
+    preflight: false,
+  },
   plugins: [
-    require('@tailwindcss/aspect-ratio'),
-    require('@tailwindcss/line-clamp'),
     require('@tailwindcss/typography'),
     require('@tailwindcss/forms'),
     plugin(function ({ addVariant, e, postcss }) {

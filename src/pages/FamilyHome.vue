@@ -1,12 +1,5 @@
 <template>
   <base-template :title="familyName">
-    <div class="flex items-center justify-between">
-      <router-link to="/upload" class="font-semibold text-secondary-500">
-        <i class="fa-solid fa-upload"></i>
-        <span class="ml-2">Upload</span>
-      </router-link>
-      <avatar-menu />
-    </div>
     <div class="flex flex-wrap mt-4">
       <video-result v-for="result in videoResults" @select="handleVideoSelect" :result="result" class="mr-8 mb-8" />
     </div>

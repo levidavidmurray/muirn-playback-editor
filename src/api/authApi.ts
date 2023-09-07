@@ -8,6 +8,8 @@ import {
   IFamilyResponse,
   IFamilyMemberResponse,
   IVideoResponse,
+IUploadResponse,
+IUploadInput,
 } from './types'
 const BASE_URL = 'http://localhost:3000'
 
@@ -26,7 +28,7 @@ export const refreshAccessTokenFn = async () => {
 authApi.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken')
   if (token) {
-    config.headers['Authorization'] = `${token}`
+    config.headers['Authorization'] = `Bearer ${token}`
   }
   return config
 })
@@ -55,7 +57,7 @@ export const loginUserFn = async (user: ILoginInput) => {
 
   const token = response.headers['authorization']
   if (token) {
-    localStorage.setItem('accessToken', token)
+    localStorage.setItem('accessToken', token.replace('Bearer ', ''))
   }
 
   return response.data
@@ -87,7 +89,7 @@ export const getFamilyMemberFn = async (familyMemberId: string) => {
 export const uploadVideoFn = async (video: File) => {
   const formData = new FormData()
   formData.append('video', video)
-  const response = await authApi.post<IVideoResponse>('/videos', formData, {
+  const response = await authApi.post<IVideoResponse>('/uploads', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -95,7 +97,17 @@ export const uploadVideoFn = async (video: File) => {
   return response.data
 }
 
-export const getVideoFn = async (videoId: string) => {
-  const response = await authApi.get<IVideoResponse>(`/videos/${videoId}`)
+export const getUploadFn = async (id: string) => {
+  const response = await authApi.get<IUploadResponse>(`/uploads/${id}`)
+  return response.data
+}
+
+export const updateUploadFn = async (id: string, data: IUploadInput) => {
+  const response = await authApi.put<IUploadResponse>(`/uploads/${id}`, { upload: data })
+  return response.data
+}
+
+export const getVideoFn = async (id: string) => {
+  const response = await authApi.get<IVideoResponse>(`/videos/${id}`)
   return response.data
 }

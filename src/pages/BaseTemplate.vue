@@ -1,6 +1,7 @@
 <template>
-  <header class="container py-8 mx-auto">
-    <h1 class="text-primary-500 text-5xl font-black">{{ title }}</h1>
+  <header class="container py-8 mx-auto relative">
+    <h1 class="text-primary-500 text-5xl font-black my-0">{{ title }}</h1>
+    <avatar-menu />
   </header>
   <div class="container mx-auto">
     <slot></slot>
@@ -9,6 +10,7 @@
 </template>
 <script setup lang="ts">
 import { useHead } from '@vueuse/head'
+import AvatarMenu from '@/components/AvatarMenu.vue';
 
 const props = defineProps<{
   title?: string

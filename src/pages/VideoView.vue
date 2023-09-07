@@ -1,10 +1,10 @@
 <template>
-  <base-template title="Video Player">
+  <base-template>
     <div class="max-w-7xl">
-      <div class="overflow-hidden rounded-lg">
-        <video-player :video="video" />
+      <div class="overflow-hidden sm:rounded-lg">
+        <video-player :video-src="video.video_url" />
       </div>
-      <div class="mt-4">
+      <div class="mt-4 px-4 sm:px-0">
         <h3 class="my-0 font-semibold text-2xl">{{ video.title }}</h3>
         <p class="mt-1 mb-2 text-gray-600">{{ video.date }}</p>
         <div class="flex items-center">
