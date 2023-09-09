@@ -1,6 +1,8 @@
 <template>
-  <header class="container py-8 mx-auto relative">
-    <h1 class="text-primary-500 text-5xl font-black my-0">{{ title }}</h1>
+  <header class="container py-8 mx-auto relative flex items-center justify-between">
+    <router-link :to="{ name: 'home' }">
+      <site-logo />
+    </router-link>
     <avatar-menu />
   </header>
   <div class="container mx-auto">
@@ -11,6 +13,7 @@
 <script setup lang="ts">
 import { useHead } from '@vueuse/head'
 import AvatarMenu from '@/components/AvatarMenu.vue';
+import SiteLogo from '@/components/SiteLogo.vue';
 
 const props = defineProps<{
   title?: string

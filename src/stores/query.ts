@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "vue-query";
-import { getFamilyFn, getFamilyMemberFn, getMeFn, getUploadFn, getVideoFn, updateUploadFn } from "@/api/authApi";
+import { getFamilyFn, getFamilyMemberFn, getMeFn, getUploadFn, getVideoFn, getVideosFn, updateUploadFn, updateVideoFn } from "@/api/authApi";
 import { ComputedRef, Ref } from "vue";
-import { IUploadInput } from "@/api/types";
+import { IUploadInput, IVideoInput } from "@/api/types";
 
 export function useMeQuery() {
   return useQuery('me', getMeFn)
@@ -25,4 +25,12 @@ export function useUploadMutation(uploadId: string) {
 
 export function useVideoQuery(videoId: string) {
   return useQuery(['video', videoId], () => getVideoFn(videoId))
+}
+
+export function useVideosQuery() {
+  return useQuery('videos', getVideosFn)
+}
+
+export function useVideoMutation(videoId: string) {
+  return useMutation((data: IVideoInput) => updateVideoFn(videoId, data))
 }

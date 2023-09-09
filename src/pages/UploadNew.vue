@@ -99,7 +99,7 @@ const onUploadFinish: OnFinish = ({ file, event }: { file: SettledFileInfo; even
     return
   }
 
-  router.push({ name: 'upload', params: { uploadId: data.id }})
+  router.push({ name: 'videoEdit', params: { id: data.id }})
 }
 
 function handleUpload() {

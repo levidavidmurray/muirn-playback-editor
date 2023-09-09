@@ -41,15 +41,23 @@ export type IFamilyMemberResponse = IData<IFamilyMemberRecord>
 
 export type IVideoRecord = IRootRecord<{
   title: string
+  date: string
+  manifestUrl: string
   thumbnailUrl: string
-  videoUrl: string
-  date: number
 }, {
   user: IData<IRecord>
   family: IData<IRecord>
 }>
 
 export type IVideoResponse = IData<IVideoRecord>
+
+export type IVideosResponse = IData<Array<IVideoRecord>>
+
+export interface IVideoInput {
+  title: string
+  date: string
+  family_id?: string
+}
 
 export type IUploadRecord = IRootRecord<{
   date: string

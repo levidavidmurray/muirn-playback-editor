@@ -1,7 +1,7 @@
 <template>
   <base-template :title="familyName">
-    <div class="flex flex-wrap mt-4">
-      <video-result v-for="result in videoResults" @select="handleVideoSelect" :result="result" class="mr-8 mb-8" />
+    <div class="flex flex-wrap">
+      <video-result v-for="video in videos" @select="handleVideoSelect" :video="video" class="mr-8 mb-8" />
     </div>
   </base-template>
 </template>
@@ -10,15 +10,14 @@
 import { computed } from 'vue';
 import BaseTemplate from './BaseTemplate.vue'
 import VideoResult from '@/components/VideoResult.vue'
-import AvatarMenu from '@/components/AvatarMenu.vue'
-import { VideoResultDto } from '@/api/types';
-import { useFamilyQuery, useMeQuery } from '@/stores/query';
+import { IVideoRecord, VideoResultDto } from '@/api/types';
+import { useFamilyQuery, useMeQuery, useVideosQuery } from '@/stores/query';
 import router from '@/router';
 
 const { data: user } = useMeQuery()
 
-const handleVideoSelect = (video: VideoResultDto) => {
-  router.push({ name: 'video', params: { videoId: video.id } })
+const handleVideoSelect = (video: IVideoRecord) => {
+  router.push({ name: 'videoView', params: { id: video.id } })
 }
 
 const familyId = computed(() => {
@@ -33,6 +32,8 @@ const familyName = computed(() => {
   if (!family.value) return 'Loading'
   return family.value.data.attributes?.name
 })
+
+const { data: videos } = useVideosQuery()
 
 const testVideo = {
   id: '1',

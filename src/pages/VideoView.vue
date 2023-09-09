@@ -2,7 +2,7 @@
   <base-template>
     <div class="max-w-7xl">
       <div class="overflow-hidden sm:rounded-lg">
-        <video-player :video-src="video.video_url" />
+        <video-player v-if="videoSrc" :video-src="videoSrc" />
       </div>
       <div class="mt-4 px-4 sm:px-0">
         <h3 class="my-0 font-semibold text-2xl">{{ video.title }}</h3>
@@ -20,6 +20,18 @@
 import BaseTemplate from './BaseTemplate.vue';
 import VideoPlayer from '@/components/VideoPlayer.vue';
 import Avatar from '@/components/Avatar.vue';
+import { useRoute } from 'vue-router';
+import { useVideoQuery } from '@/stores/query';
+import { computed } from 'vue';
+
+const route = useRoute()
+
+const { id: videoId } = route.params as { id: string }
+
+const { data: videoData } = useVideoQuery(videoId)
+
+const videoSrc = computed(() => videoData?.value?.attributes?.manifestUrl)
+
 
 const video = {
   title: "Levi & Drew are gonna get married!",

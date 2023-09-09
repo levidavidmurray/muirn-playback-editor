@@ -50,11 +50,19 @@ const routes = [
     },
   },
   {
-    name: 'video',
-    path: '/video/:videoId',
+    name: 'videoView',
+    path: '/videos/:id',
     component: () => import('@/pages/VideoView.vue'),
     meta: {
       title: 'Video Player',
+    },
+  },
+  {
+    name: 'videoEdit',
+    path: '/videos/:id/edit',
+    component: () => import('@/pages/VideoEdit.vue'),
+    meta: {
+      title: 'Video Edit',
     },
   },
 ]

@@ -1,6 +1,6 @@
 <template>
   <n-dropdown trigger="click" :options="options" @select="handleSelect">
-    <n-button quaternary class="py-2 box-content absolute right-0 top-4">
+    <n-button quaternary class="py-2 box-content">
       <avatar size="32px" src="/levi-avatar.jpg" />
       <span class="ml-2 font-medium">{{ fullName }}</span>
     </n-button>

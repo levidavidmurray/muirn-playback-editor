@@ -10,6 +10,8 @@ import {
   IVideoResponse,
 IUploadResponse,
 IUploadInput,
+IVideoInput,
+IVideosResponse,
 } from './types'
 const BASE_URL = 'http://localhost:3000'
 
@@ -107,7 +109,17 @@ export const updateUploadFn = async (id: string, data: IUploadInput) => {
   return response.data
 }
 
+export const getVideosFn = async () => {
+  const response = await authApi.get<IVideosResponse>('/videos')
+  return response.data.data
+}
+
 export const getVideoFn = async (id: string) => {
   const response = await authApi.get<IVideoResponse>(`/videos/${id}`)
+  return response.data.data
+}
+
+export const updateVideoFn = async (id: string, data: IVideoInput) => {
+  const response = await authApi.put<IVideoResponse>(`/videos/${id}`, { video: data })
   return response.data
 }
